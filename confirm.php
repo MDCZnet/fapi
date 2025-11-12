@@ -51,6 +51,7 @@ if ($errors) {
     exit;
 }
 
+$isValidRequest = true;
 $tel = $telPrefix . $telNumber;
 $coffees = [];
 $totalPrice = 0;
