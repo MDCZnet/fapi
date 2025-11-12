@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testy JS validace</title>
+    <link rel="stylesheet" href="../.assets/style.css">
+</head>
+<body>
+    <div class="container">
+    <h1>Testy JS validace</h1>
+
+    <form id="orderForm">
+        <label>Jméno a příjmení:</label>
+        <input id="name" type="text"name="name">
+
+        <label>Číslo sedačky:</label>
+        <input id="seat" type="text" name="seat">
+
+        <label>Telefon:</label>
+        <div class="phone-field">
+            <select id="telPrefix" name="tel_prefix"><option value="+420">+420</option></select>
+            <input id="telNumber" type="tel" name="tel_number">
+        </div>
+
+        <label>E-mail:</label>
+        <input id="email" type="email" name="email">
+    </form>
+
+    <div id="testResults">
+        <pre id="log"></pre>
+    </div>
+
+    <script src="../.assets/validate.js"></script>
+    <script>
+        function runTest(name, setup, expectPrevented) {
+            setup();
+            const form = document.getElementById('orderForm');
+            const evt = new Event('submit', {cancelable: true});
+            form.dispatchEvent(evt);
+            const passed = (evt.defaultPrevented === expectPrevented);
+            write(`${passed ? '✅ PASS' : '❌ FAIL'} – ${name}`);
+        }
+
+        const form = document.getElementById('orderForm');
+        const log = document.getElementById('log');
+
+        function write(message) {
+            console.log(message);
+            log.textContent += message + '\n';
+        }
+
+        runTest('INVALID DATA / null', () => {
+            form.name.value = '';
+            form.seat.value = '';
+            form.tel_prefix.value = '';
+            form.tel_number.value = '';
+            form.email.value = '';
+        }, true);
+
+        runTest('INVALID PHONE / 123', () => {
+            form.name.value = 'Jan Novak';
+            form.seat.value = 'A1234';
+            form.tel_prefix.value = '+420';
+            form.tel_number.value = '123';
+            form.email.value = 'jan@example.com';
+        }, true);
+
+        runTest('INVALID EMAIL / bad@@example.com', () => {
+            form.name.value = 'Jan Novak';
+            form.seat.value = 'A1234';
+            form.tel_prefix.value = '+420';
+            form.tel_number.value = '724123456';
+            form.email.value = 'bad@@example.com';
+        }, true);
+
+        runTest('VALID DATA / Jan Novak / A1234 / 724123456 / jan@example.com', () => {
+            form.name.value = 'Jan Novak';
+            form.seat.value = 'A1234';
+            form.tel_number.value = '724123456';
+            form.email.value = 'jan@example.com';
+        }, false);
+    </script>
+</body>
+</html>
